@@ -40,7 +40,7 @@ base_shape <- c(1,2,6,2,1)
 for (iter in 1:10){
   # repeat 10 times
   
-  rain_locations <- runif(n, min = max_duration, max = l - max_duration) %>% round # assuming dry periods at begining and end of time series
+  rain_locations <- runif(n, min = max_duration, max = l - max_duration) %>% round # assuming dry periods at beginning and end of time series
   rain_durations <- runif(n, min = minimal_duration, max = max_duration) %>% round
   rain_peaks <- rnorm(n, mu, sigma) %>% abs()
   rain_peaks[rain_peaks > 5] <- 5 # peak rainfall of a base rainfall < 5
@@ -67,7 +67,7 @@ for (iter in 1:10){
   # write 
   write.table(
     out %>%
-      mutate(lines = paste("rain", year(datetime), month(datetime), day(datetime), hour(datetime), minute(datetime), rain)) %>%
+      mutate(lines = paste(format(out$datetime,format="%m/%d/%Y %H:%M"), rain)) %>%
       pull(lines),
     file = paste0("./data/rain_", iter,".csv"),
     row.names = F, 

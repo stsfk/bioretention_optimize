@@ -1,0 +1,153 @@
+[TITLE]
+;;Project Title/Notes
+
+[OPTIONS]
+;;Option             Value
+FLOW_UNITS           CFS
+INFILTRATION         GREEN_AMPT
+FLOW_ROUTING         DYNWAVE
+LINK_OFFSETS         DEPTH
+MIN_SLOPE            0
+ALLOW_PONDING        NO
+SKIP_STEADY_STATE    NO
+
+START_DATE           01/01/2006
+START_TIME           00:00:00
+REPORT_START_DATE    01/01/2006
+REPORT_START_TIME    00:00:00
+END_DATE             01/02/2007
+END_TIME             00:00:00
+SWEEP_START          01/01
+SWEEP_END            12/31
+DRY_DAYS             0
+REPORT_STEP          00:01:00
+WET_STEP             00:00:15
+DRY_STEP             00:01:00
+ROUTING_STEP         0:00:15 
+
+INERTIAL_DAMPING     PARTIAL
+NORMAL_FLOW_LIMITED  BOTH
+FORCE_MAIN_EQUATION  H-W
+VARIABLE_STEP        0.75
+LENGTHENING_STEP     0
+MIN_SURFAREA         12.566
+MAX_TRIALS           8
+HEAD_TOLERANCE       0.005
+SYS_FLOW_TOL         5
+LAT_FLOW_TOL         5
+MINIMUM_STEP         0.5
+THREADS              8
+
+[FILES]
+;;Interfacing Files
+SAVE OUTFLOWS "outflow.txt"
+
+[EVAPORATION]
+;;Data Source    Parameters
+;;-------------- ----------------
+MONTHLY          0.092964186	0.090008146	0.097790196	0.120734908	0.146050292	0.166141732	0.191135382	0.172466345	0.158267717	0.143256287	0.116535433	0.097409195
+DRY_ONLY         YES
+
+[RAINGAGES]
+;;Name           Format    Interval SCF      Source    
+;;-------------- --------- ------ ------ ----------
+G1               INTENSITY 00:10     1.0      TIMESERIES rain    
+
+[SUBCATCHMENTS]
+;;Name           Rain Gage        Outlet           Area     %Imperv  Width    %Slope   CurbLen  SnowPack        
+;;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- ----------------
+S1               G1               O1               1.236    100      538.4016 2        0                        
+S2               G1               O1               0.000    0        0.00     2        0                        
+
+[SUBAREAS]
+;;Subcatchment   N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted 
+;;-------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
+S1               0.012      0.24       0.05       0.15       0          OUTLET    
+S2               0.012      0.24       0.05       0.15       0          OUTLET    
+
+[INFILTRATION]
+;;Subcatchment   Suction    Ksat       IMD       
+;;-------------- ---------- ---------- ----------
+S1               6.69       0.26       0.364     
+S2               6.69       0.26       0.364     
+
+[LID_CONTROLS]
+;;Name           Type/Layer Parameters
+;;-------------- ---------- ----------
+GreenRoof        GR
+GreenRoof        SURFACE    1          0.1        0.1        2          0         
+GreenRoof        SOIL       4          0.6        0.3        0.1        40         30         2         
+GreenRoof        DRAINMAT   2          0.5        0.012     
+
+PP               PP
+PP               SURFACE    0.05       0          0.012      1          0         
+PP               PAVEMENT   6          0.2        0          30         0         
+PP               SOIL       8          0.25       0.15       0.05       10         30         2         
+PP               STORAGE    12         0.66       0.26       0         
+PP               DRAIN      0.1010     0.5        6          6         
+
+BioretentionCell BC
+BioretentionCell SURFACE    6          0.05       0          1          0         
+BioretentionCell SOIL       24         0.52       0.15       0.08       4.7        39.3       1.9       
+BioretentionCell STORAGE    12         0.67       0.5        0         
+BioretentionCell DRAIN      0.1        0.5        6          6         
+
+[LID_USAGE]
+;;Subcatchment   LID Process      Number  Area       Width      InitSat    FromImp    ToPerv     RptFile                  DrainTo         
+;;-------------- ---------------- ------- ---------- ---------- ---------- ---------- ---------- ------------------------ ----------------
+S1               GreenRoof        1      0          0          0          0          0          *                        O2              
+S1               PP               1      0          0          0          0          0          *                        O2              
+S1               BioretentionCell 1      0          0          0          0          0          *                        O2              
+
+[OUTFALLS]
+;;Name           Elevation  Type       Stage Data       Gated    Route To        
+;;-------------- ---------- ---------- ---------------- -------- ----------------
+O1               0          FREE                        NO                       
+O2               0          FREE                        NO                       
+
+[TIMESERIES]
+;;Name           Date       Time       Value     
+;;-------------- ---------- ---------- ----------
+rain             FILE       rain_1.csv
+
+[REPORT]
+;;Reporting Options
+INPUT      NO
+CONTROLS   NO
+SUBCATCHMENTS ALL
+NODES ALL
+LINKS ALL
+
+[TAGS]
+
+[MAP]
+DIMENSIONS 0.000 0.000 10000.000 10000.000
+Units      None
+
+[COORDINATES]
+;;Node           X-Coord            Y-Coord           
+;;-------------- ------------------ ------------------
+O1               5368.803           4135.429          
+O2               6302.158           3985.612          
+
+[VERTICES]
+;;Link           X-Coord            Y-Coord           
+;;-------------- ------------------ ------------------
+
+[Polygons]
+;;Subcatchment   X-Coord            Y-Coord           
+;;-------------- ------------------ ------------------
+S1               5600.000           7200.000          
+S1               5600.000           4200.000          
+S1               2900.000           4200.000          
+S1               2900.000           7200.000         
+S2               9900.000           6400.000          
+S2               9900.000           4200.000          
+S2               7700.000           4200.000         
+S2               7700.000           6400.000          
+
+[SYMBOLS]
+;;Gage           X-Coord            Y-Coord           
+;;-------------- ------------------ ------------------
+G1               4074.970           8162.031          
+
