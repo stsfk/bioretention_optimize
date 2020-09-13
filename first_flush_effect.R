@@ -251,7 +251,6 @@ for (i in 1:81){
 FF_depths <- bind_rows(FF_depths)
 
 # Figure 4 ----------------------------------------------------------------
-load("Figure4.Rda")
 
 data_plot <- FF_depths
 
@@ -293,13 +292,14 @@ ggplot(data_plot2, aes(gi, tar_percentage)) +
        colour = "Initial runoff",
        linetype = "Initial runoff") +
   coord_flip() +
-  theme_bw2() +
+  theme_bw() +
   theme(legend.key.width = unit(1, "cm")) 
 
-ggsave("Figure4.pdf", width = 190, height = 120, units = "mm") 
+ggsave("./figures/Figure4.pdf", width = 190, height = 120, units = "mm") 
+
+save(FF_depths, file='./figures/Figure4.Rda')
 
 # Analysis ----------------------------------------------------------------
-library(tidyverse)
 
 data_plot <- FF_depths
 
@@ -316,7 +316,6 @@ data_analysis <- data_plot2 %>%
          depth_ind == 125) %>%
   select(gi,tar_percentage)
 
-write.csv(data_analysis, "fig4.csv")
-
+write.csv(data_analysis, "./figures/fig4.csv")
 
 
