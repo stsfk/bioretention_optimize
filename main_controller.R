@@ -11,7 +11,7 @@ pacman::p_load(tidyverse, lubridate, parallel, stringr, swmmr)
 
 # Set up clusters for SWMM simulation -----------------------------------
 
-no_cores <- min(5, detectCores() - 1) # no_cores is the number of clusters for parallel simulation of SWMM
+no_cores <- min(10, detectCores() - 1) # no_cores is the number of clusters for parallel simulation of SWMM
 paths <- as.list(str_c(getwd(),"/cluster",c(1:no_cores)))
 cl <- makeCluster(no_cores) # start cluster
 org_wd <- getwd()
@@ -73,7 +73,7 @@ move_file <- function(file_name, folder_suffix, file_suffix,
   
   setwd(from_folder)
   
-  file_location <- str_c(to_folder, "/",folder_prefix, folder_suffix,collapse = "")
+  file_location <- str_c(to_folder, "/",folder_prefix, folder_suffix, collapse = "")
   if (!dir.exists(file_location)) {
     dir.create(file_location)
   }
@@ -121,8 +121,9 @@ clean_after_run <- function(x) {
 
 write_series <- function(input_file, output_file1, output_file2, skip = 9, conveter = 1.699011){
   # this function is to write time series files of underdrain flow and surface runoff
+  # the resolution is 1-minute
   dat <- read.table(input_file, skip = skip)
-  dat <- matrix(unlist(dat[, 8]), ncol = 2, byrow = T) * conveter # convert to m3/min
+  dat <- matrix(unlist(dat[, 8]), ncol = 2, byrow = T) * conveter # convert from CFS to m3/min
   
   file_name_surf <- str_c(output_file1, collapse = "")
   file_name_ud <- str_c(output_file2, collapse = "")
@@ -156,6 +157,7 @@ br_AR = 50 # bioretention cells' maximum contributing drainage area capture rati
 
 # main --------------------------------------------------------------------
 
+# prepare variables to be changed for evaluating bioretention performance
 grid <- expand.grid(year = 1:years, case = 1:cases) %>%
   tibble() %>%
   mutate(br_area = (area_imp * 0.02 + (case - 1) * (1.236 * 0.001))*43560, # surface area of bioretention cells, in ft2
@@ -164,6 +166,7 @@ grid <- expand.grid(year = 1:years, case = 1:cases) %>%
          width_imp = area_imp_lid / 100, # width of imperious area excluding LID, assuming drainage path length = 100 
          drain_percent_br = min(br_area / area_imp_lid * br_AR * 100, 100)) # percent of impervious area drains to bioretention
 
+# start SWMM evaluation
 for (i in 1:years){
   # evaluate bioretention implementation scenarios in different years
   
@@ -183,7 +186,7 @@ for (i in 1:years){
   }
   
   # create function to keep SWMM and rainfall files after execute a simulation
-  remain_files <- c("swmm5.exe",paste0("rain",i,".csv"), "swmm5.dll")
+  remain_files <- c("swmm5.exe", paste0("rain_",i,".csv"), "swmm5.dll")
   clean <- clean_after_run(remain_files)
   
   # path of the SWMM input file to be evaluated
@@ -201,31 +204,30 @@ for (i in 1:years){
     file_suffix <- as.list(ind)
     arguments <- list(file_2_copy, folder_suffix, file_suffix) 
     arguments %>%
-      pmap(move_file,"cluster","test", from_folder = "./input_files/")
+      pmap(move_file, folder_prefix  = "cluster", file_prefix = "test", from_folder =  paste0(org_wd, "/input_files"), to_folder = org_wd)
     
-    # run on clusters "cl" using run_swmm function
-    parLapply(cl, paths, run_swmm) 
+    # run swmm simulations on clusters "cl" using run_swmm function
+    parLapply(cl, paths, run_swmm)
     
     # move file
     for (k in 1:no_cores){
       move_file("outflow.txt",folder_suffix = i, file_suffix = ind[k], folder_prefix = "year",
-                file_prefix = "br",from_folder = paths[[k]], to_folder = "./results")
+                file_prefix = "br", from_folder = paths[[k]], to_folder = paste0(org_wd, "/results"))
       move_file("test1.rpt",folder_suffix = i, file_suffix = ind[k], folder_prefix = "year",
-                file_prefix = "br",from_folder = paths[[k]], to_folder = "./results")
+                file_prefix = "br",from_folder = paths[[k]], to_folder = paste0(org_wd, "/results"))
     }
     
     # clean cluster for evaluating new input files
-    lapply(paths,clean)
+    lapply(paths, clean)
   }
   
   # clean cluster
-  
   delete_file(input_files)
-  clean <- clean_after_run(c("swmm5.exe"))
-  lapply(paths,clean)
+  clean <- clean_after_run(c("swmm5.exe", "swmm5.dll"))
+  lapply(paths, clean)
   
-  # write surf and ud series files
-  file_location <- str_c(org_wd, "/", "year", i, "/", collapse = "")
+  # write surface (surf)) and uderdrain (ud) series files
+  file_location <- str_c(org_wd, "/results/", "year", i, "/", collapse = "")
   setwd(file_location)
   
   br_files <- list.files(pattern = '^br.*\\.txt')

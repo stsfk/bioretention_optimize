@@ -44,8 +44,8 @@ DRY_ONLY YES
 G1 INTENSITY 00:10 1 TIMESERIES rain
 
 [SUBCATCHMENTS]
-S1 G1 O1 1.236 100 524.4031584 2 0 
-S2 G1 O1 0 0 524.4031584 2 0 
+S1 G1 O1 1.236 100 511.29 2 0 
+S2 G1 O1 0 0 0 2 0 
 
 [SUBAREAS]
 S1 0.012 0.24 0.05 0.15 0 OUTLET 
@@ -75,14 +75,14 @@ BioretentionCell DRAIN 0.1 0.5 6 6 0 0
 [LID_USAGE]
 S1 GreenRoof 1 0 0 0 0 0 * O2               0
 S1 PP 1 0 0 0 0 0 * O2               0
-S1 BioretentionCell 1 1399.84416 69.992208 0 100 0 * O2               0
+S1 BioretentionCell 1 0 0 0 0 0 * O2               0
 
 [OUTFALLS]
 O1 0 FREE  NO 
 O2 0 FREE  NO 
 
 [TIMESERIES]
-rain  FILE rain_1.csv
+rain  FILE rain_7.csv
 
 [REPORT]
 SUBCATCHMENTS ALL

@@ -3,4 +3,7 @@
 .RData
 .Ruserdata
 *.exe
+*.txt
+*.out
+*.dll
 /results
