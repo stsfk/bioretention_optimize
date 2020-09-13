@@ -43,7 +43,7 @@ org_wd <- getwd()
 read_rain <- function(file){
   temp <- readLines(file)
   
-  rain_depths <- as.numeric(str_sub(temp, 20, -1))
+  rain_depths <- as.numeric(str_sub(temp, 18, -1))
   rain_depths<- rain_depths/12*25.4 # convert from inch/h to mm per 5 min
   
   return(c(rain_depths))
