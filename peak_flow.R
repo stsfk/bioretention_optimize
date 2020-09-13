@@ -327,7 +327,7 @@ save(BR_peak_volumes,data_plot,data_plot2, data_plot3, data_plot4, file='./figur
 # Analysis ----------------------------------------------------------------
 library(tidyverse)
 
-load("Figure6.Rda")
+load("./figures/Figure6.Rda")
 data_analysis <- data_plot3 %>%
   filter(ietd == "16 h",
          Quantiles %in% c("q10","q.weighted"))
