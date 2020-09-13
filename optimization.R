@@ -1,11 +1,11 @@
-library(tidyverse)
-library(modelr)
-library(stringr)
+# Figure 9 ----------------------------------------------------------------
 
-# Read data ---------------------------------------------------------------
-data <- read.table("clipboard", header = T)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, modelr)
 
-data <- data %>%
+# Start -------------------------------------------------------------------
+
+data <- read_csv("./figures/overall_results.csv") %>%
   select(gi, rv, ff, q10_2, q10_4, w_2, w_4
   )
 
@@ -149,9 +149,9 @@ ggplot(results, aes(gi, value, colour = type, linetype = storm)) +
        colour = "Preference") +
   theme_bw(base_size = 7)
 
-ggsave("Figure9.pdf", width = 190, height = 120, units = "mm")
+ggsave("./figures/Figure9.pdf", width = 190, height = 120, units = "mm")
 
-save(results, file='figure9.Rda')
+save(results, file='./figures/figure9.Rda')
 
 
 

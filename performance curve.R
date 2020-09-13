@@ -1,14 +1,11 @@
 # Figure 8 ----------------------------------------------------------------
 
-library(tidyverse)
-library(modelr)
-library(stringr)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, modelr)
 
 # Start -------------------------------------------------------------------
 
-data <- read.table("clipboard", header = T)
-
-data[data > 100] <- 100 # deal with the prediction errors
+data <- read_csv("./figures/overall_results.csv")
 
 predict_fac <- function(model){
   # function factory for generate predictions
@@ -38,14 +35,14 @@ find_requr_bc <- function(tar_pec, fun){
 }
 
 FF_area_req <- sapply(c(7:9)*10, find_requr_bc, fun = ff_f)
-FF_df <- data_frame(FF_thd = c(7:9)*10,
+FF_df <- tibble(FF_thd = c(7:9)*10,
                     FF_area_req = FF_area_req)
 names(FF_area_req) <- paste0("FF ",(c(7:9)*10), "%")
 
-RV_area_req <- sapply(c(5:7)*10, find_requr_bc, fun = rv_f)
-RV_df <- data_frame(RV_thd = c(5:7)*10,
+RV_area_req <- sapply(c(2:4)*10, find_requr_bc, fun = rv_f)
+RV_df <- tibble(RV_thd = c(2:4)*10,
                     RV_area_req = RV_area_req)
-names(RV_area_req) <- paste0("RV ",(c(5:7)*10), "%")
+names(RV_area_req) <- paste0("RV ",(c(2:4)*10), "%")
 
 req <- c(FF_area_req, RV_area_req)
 req <- as.data.frame(matrix(unname(req), ncol = 2, byrow = F))
@@ -61,13 +58,15 @@ data_process <- data %>%
   gather(item, value, -gi) %>%
   group_by(item) %>%
   nest() %>%
-  mutate(model = map(data, loess_model),
-         pred = map2(data, model, add_predictions)
+  rename(data2 = data) %>%
+  mutate(
+    model = map(data2, loess_model),
+    pred = map2(data2, model, add_predictions)
   ) %>%
   unnest(pred)
 
 data <- data_process %>%
-  select(-value) %>%
+  select(-value, -data2, -model) %>%
   spread(item, pred)
 
 temp <- data[1,] # this is to plot horizontal lines on the left
@@ -92,7 +91,7 @@ data_process <- data_process %>%
   ungroup() 
 
 ff_names <- paste0("FF reduction ",(c(7:9)*10), "%")
-rv_names <- paste0("RV reduction ",(c(5:7)*10), "%")
+rv_names <- paste0("RV reduction ",(c(2:4)*10), "%")
 
 result <- vector("list", 9)
 k <- 1
@@ -142,6 +141,6 @@ ggplot(result, aes(value, gi, linetype = perc,  colour = type)) +
        linetype = "Storm groups",
        colour = "Curve types")
 
-ggsave("figure8.pdf", width = 190, height = 120, units = "mm")
+ggsave("./figures/figure8.pdf", width = 190, height = 120, units = "mm")
 
-save(result, file='Figure8.Rda')
+save(result, file='./figures/Figure8.Rda')

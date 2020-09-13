@@ -280,9 +280,9 @@ save(BR_peak_volumes,data_plot,data_plot2, data_plot3, file='figures/Figure7.Rda
 
 
 library(tidyverse)
-load("Figure7.Rda")
+load('figures/Figure7.Rda')
 
-write.csv(data_plot, "fig7.csv")
+write.csv(data_plot, "./figures/fig7.csv")
 
 
 

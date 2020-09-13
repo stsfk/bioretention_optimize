@@ -330,5 +330,6 @@ library(tidyverse)
 load("./figures/Figure6.Rda")
 data_analysis <- data_plot3 %>%
   filter(ietd == "16 h",
-         Quantiles %in% c("q10","q.weighted"))
-
+         Quantiles %in% c("q10","q.weighted")) %>%
+  select(Quantiles, gi, value, peak_percentile )
+write.csv(data_analysis, "./figures/fig6.csv")
